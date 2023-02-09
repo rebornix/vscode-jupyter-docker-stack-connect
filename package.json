@@ -2,9 +2,9 @@
   	"name": "vscode-jupyter-docker-stack-connect",
   	"displayName": "Jupyter Docker Stack Connect",
   	"description": "",
-  	"version": "0.0.1",
+  	"version": "0.0.2",
   	"engines": {
-  	  	"vscode": "^1.74.0"
+  	  	"vscode": "^1.75.0"
   	},
   	"publisher": "rebornix",
   	"categories": [
