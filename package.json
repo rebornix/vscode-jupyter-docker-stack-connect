@@ -21,7 +21,6 @@
 		"url": "https://github.com/rebornix/vscode-jupyter-docker-stack-connect"
 	},
   	"main": "./out/extension.js",
-  	"browser": "./dist/web/extension.js",
   	"contributes": {
   	  	"pythonRemoteServerProvider": [
   	  	  	{
@@ -35,8 +34,7 @@
   	  	"watch": "tsc -watch -p ./",
   	  	"pretest": "yarn run compile && yarn run lint",
   	  	"lint": "eslint src --ext ts",
-  	  	"test": "node ./out/test/runTest.js",
-  	  	"compile-web": "webpack"
+  	  	"test": "node ./out/test/runTest.js"
   	},
   	"devDependencies": {
   	  	"@types/glob": "^7.2.0",
