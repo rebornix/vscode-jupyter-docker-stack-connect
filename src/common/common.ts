@@ -1,3 +1,4 @@
+import { JupyterServer } from '@vscode/jupyter-extension';
 import * as vscode from 'vscode';
 
 export type JupyterServerUriHandle = string;
@@ -29,13 +30,14 @@ export interface IContainerProviderContrib {
     getServerUri(handle: JupyterServerUriHandle): Promise<IJupyterServerUri>;
     getHandles(): Promise<JupyterServerUriHandle[]>;
     removeHandle(handle: JupyterServerUriHandle): Promise<void>;
-    getQuickPickEntryItems(): Promise<IQuickPick[]> | IQuickPick[];
+    getQuickPickEntryItems(): IQuickPick[];
 }
 
 
 export interface IQuickPick extends vscode.QuickPickItem {
     id: string;
-    execute: (backEnabled: boolean) => Promise<JupyterServerUriHandle | 'back' | undefined>;
+    title: string;
+    execute: (backEnabled: boolean) => Promise<JupyterServer | 'back' | undefined>;
 }
 
 export interface IContainerServer extends IJupyterServerUri {

@@ -31,9 +31,9 @@ export class ContainerServer implements IJupyterUriProvider {
         
         return items;
     }
-    async handleQuickPick(item: IQuickPick, backEnabled: boolean): Promise<string | undefined> {
-        return item.execute(backEnabled);
-    }
+    // async handleQuickPick(item: IQuickPick, backEnabled: boolean): Promise<string | undefined> {
+    //     return item.execute(backEnabled);
+    // }
     async getServerUri(handle: JupyterServerUriHandle): Promise<IJupyterServerUri> {
         for (const contribution of this._contributions) {
             if (contribution.canHandle(handle)) {

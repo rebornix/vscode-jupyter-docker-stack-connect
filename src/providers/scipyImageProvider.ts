@@ -3,6 +3,7 @@ import { spawn } from 'child_process';
 import { getPortFree, parseServerInfoFromLog, spawnAsync } from '../common/helpers';
 import { IContainerProviderContrib, IJupyterServerUri, IQuickPick, JupyterServerUriHandle } from '../common/common';
 import { JupyterServerContainer } from '../common/serverContainerInstance';
+import { JupyterServer } from '@vscode/jupyter-extension';
 
 export class SciPyContainerServerProvider implements IContainerProviderContrib {
     private _handles: JupyterServerContainer[] = [];
@@ -79,6 +80,7 @@ export class SciPyContainerServerProvider implements IContainerProviderContrib {
         return [
             {
                 id: 'connect-scientific-python',
+                title: 'Scientific Python Stack (jupyter/scipy-notebook)',
                 label: 'Scientific Python Stack (jupyter/scipy-notebook)',
                 detail: 'jupyter/scipy-notebook:85f615d5cafa',
                 execute: this.execute.bind(this)
@@ -86,9 +88,9 @@ export class SciPyContainerServerProvider implements IContainerProviderContrib {
         ];
     }
 
-    async execute(backEnabled: boolean): Promise<string | undefined> {
-        return vscode.window.withProgress<string | undefined>({ location: vscode.ProgressLocation.Notification, title: 'Starting Jupyter Server' }, async (progress) => {
-            const promise = new Promise<string | undefined>(async resolve => {
+    async execute(backEnabled: boolean): Promise<JupyterServer | undefined> {
+        return vscode.window.withProgress<JupyterServer | undefined>({ location: vscode.ProgressLocation.Notification, title: 'Starting Jupyter Server' }, async (progress) => {
+            const promise = new Promise<JupyterServer | undefined>(async resolve => {
 
                 // start a process to run docker container and listen and parse its output
                 // find a free port to use for the container
@@ -121,7 +123,8 @@ export class SciPyContainerServerProvider implements IContainerProviderContrib {
                     handleId,
                     'jupyter/scipy-notebook:85f615d5cafa',
                     'start-notebook.sh',
-                    '--notebook-dir=/home/jovyan/work/',
+                    '--NotebookApp.notebook_dir=/home/jovyan/work/',
+                    // '--notebook-dir=/home/jovyan/work/',
                     '--NotebookApp.allow_origin_pat=.*',
                     './',
                     '--no-browser'
@@ -157,7 +160,17 @@ export class SciPyContainerServerProvider implements IContainerProviderContrib {
                         this._handles.push(server);
                         handled = true;
                         progress.report({ increment: 100 });
-                        resolve(handleId);
+                        resolve({
+                            id: handleId,
+                            label: 'Scipy ' + handleId.substring('jupyter-server-provider-containers-'.length),
+                            connectionInformation: {
+                                baseUrl: vscode.Uri.parse(info.baseUrl),
+                                token: info.token,
+                                headers: info.authorizationHeader
+                            },
+                            // still proposed
+                            mappedRemoteDirectory: vscode.workspace.workspaceFolders ? vscode.workspace.workspaceFolders[0].uri : undefined // info.workingDirectory ? vscode.Uri.parse(info.workingDirectory) : undefined
+                        } as JupyterServer);
                         this._eventEmitter.fire();
                     }
                 });
