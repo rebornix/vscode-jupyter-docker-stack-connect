@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { ContainerServer } from './serverProvider2';
+import { ContainerServer } from './serverProvider';
 import { Jupyter } from '@vscode/jupyter-extension';
 
 export async function activate(context: vscode.ExtensionContext) {
