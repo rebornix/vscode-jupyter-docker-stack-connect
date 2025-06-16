@@ -26,7 +26,23 @@
             {
                 "id": "jupyter-docker-stack-connect"
             }
-        ]
+        ],
+        "configuration": {
+            "type": "object",
+            "title": "Jupyter Docker Stack Connect",
+            "properties": {
+                "jupyter-docker-stack-connect.containerImage": {
+                    "type": "string",
+                    "default": "jupyter/scipy-notebook:85f615d5cafa",
+                    "description": "Docker container image to use for Jupyter server",
+                    "examples": [
+                        "jupyter/scipy-notebook:85f615d5cafa",
+                        "quay.io/jupyter/scipy-server:latest",
+                        "docker.io/library/jupyter/scipy-notebook"
+                    ]
+                }
+            }
+        }
     },
     "scripts": {
         "vscode:prepublish": "yarn run compile",
