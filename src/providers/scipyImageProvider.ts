@@ -15,6 +15,11 @@ export class SciPyContainerServerProvider implements IContainerProviderContrib {
         this._initHandlesPromise = this._init();
     }
 
+    private getContainerImage(): string {
+        const config = vscode.workspace.getConfiguration('jupyter-docker-stack-connect');
+        return config.get<string>('containerImage', 'jupyter/scipy-notebook:85f615d5cafa');
+    }
+
     canHandle(handle: JupyterServerUriHandle): boolean {
         return this._handles.some(h => h.handle === handle);
     }
@@ -22,13 +27,14 @@ export class SciPyContainerServerProvider implements IContainerProviderContrib {
     private async _init() {
         this._logger.appendLine('Initializing container servers');
         // docker ps find all containers for image
+        const containerImage = this.getContainerImage();
         const parseContainersPromise = new Promise<JupyterServerContainer[]>(resolve => {
             try {
                 const proc = spawn('docker', [
                     'ps',
                     '-a',
                     '--filter',
-                    'ancestor=jupyter/scipy-notebook:85f615d5cafa',
+                    `ancestor=${containerImage}`,
                     '--format',
                     '{{.ID}} {{.Names}} {{.Status}}'
                 ], {
@@ -77,12 +83,13 @@ export class SciPyContainerServerProvider implements IContainerProviderContrib {
     }
 
     getQuickPickEntryItems(): IQuickPick[] {
+        const containerImage = this.getContainerImage();
         return [
             {
                 id: 'connect-scientific-python',
                 title: 'Scientific Python Stack (jupyter/scipy-notebook)',
                 label: 'Scientific Python Stack (jupyter/scipy-notebook)',
-                detail: 'jupyter/scipy-notebook:85f615d5cafa',
+                detail: containerImage,
                 execute: this.execute.bind(this)
             }
         ];
@@ -99,7 +106,8 @@ export class SciPyContainerServerProvider implements IContainerProviderContrib {
                 this._logger.appendLine(`Using port ${port}`);
                 // generate a random handle id
                 const handleId = 'jupyter-server-provider-containers-' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-                progress.report({ message: `Building container jupyter/scipy-notebook:85f615d5cafa` });
+                const containerImage = this.getContainerImage();
+                progress.report({ message: `Building container ${containerImage}` });
 
                 const args = [
                     'run',
@@ -121,7 +129,7 @@ export class SciPyContainerServerProvider implements IContainerProviderContrib {
                 args.push(...[
                     '--name',
                     handleId,
-                    'jupyter/scipy-notebook:85f615d5cafa',
+                    containerImage,
                     'start-notebook.sh',
                     '--NotebookApp.notebook_dir=/home/jovyan/work/',
                     // '--notebook-dir=/home/jovyan/work/',
